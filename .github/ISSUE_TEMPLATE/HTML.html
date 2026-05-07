@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cadê o Busão? – Bragança Paulista</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --verde: #1a9e5c;
+    --verde-escuro: #0d6e3e;
+    --verde-claro: #e6f7ef;
+    --amarelo: #f5c518;
+    --amarelo-escuro: #c49d0a;
+    --cinza: #f4f4f0;
+    --texto: #1a1a1a;
+    --texto-muted: #666;
+    --borda: #e0e0d8;
+    --branco: #ffffff;
+    --urbano: #1a9e5c;
+    --rural: #e07b1a;
+    --rural-claro: #fff4e6;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cinza);
+    color: var(--texto);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--verde-escuro);
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 20px 10px;
+  }
+
+  .bus-icon {
+    width: 44px;
+    height: 44px;
+    background: var(--amarelo);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+    animation: wobble 2.5s ease-in-out infinite;
+  }
+
+  @keyframes wobble {
+    0%, 100% { transform: rotate(0deg); }
+    15% { transform: rotate(-5deg); }
+    30% { transform: rotate(5deg); }
+    45% { transform: rotate(-3deg); }
+    60% { transform: rotate(3deg); }
+    75% { transform: rotate(0deg); }
+  }
+
+  .header-title h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 30px;
+    letter-spacing: 1px;
+    color: var(--amarelo);
+    line-height: 1;
+  }
+
+  .header-title p {
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+    margin-top: 2px;
+  }
+
+  .search-bar {
+    padding: 0 16px 12px;
+  }
+
+  .search-bar input {
+    width: 100%;
+    padding: 10px 16px 10px 40px;
+    border-radius: 24px;
+    border: none;
+    background: rgba(255,255,255,0.12);
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: background 0.2s;
+    position: relative;
+  }
+
+  .search-bar input::placeholder { color: rgba(255,255,255,0.55); }
+  .search-bar input:focus { background: rgba(255,255,255,0.2); }
+
+  .search-wrap {
+    position: relative;
+  }
+
+  .search-wrap::before {
+    content: '🔍';
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  /* FILTROS */
+  .filtros {
+    display: flex;
+    gap: 8px;
+    padding: 12px 16px;
+    overflow-x: auto;
+    background: white;
+    border-bottom: 1px solid var(--borda);
+  }
+
+  .filtros::-webkit-scrollbar { display: none; }
+
+  .filtro-btn {
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 1.5px solid var(--borda);
+    background: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+    color: var(--texto-muted);
+  }
+
+  .filtro-btn:hover { border-color: var(--verde); color: var(--verde); }
+  .filtro-btn.ativo { background: var(--verde); border-color: var(--verde); color: white; }
+  .filtro-btn.ativo-rural { background: var(--rural); border-color: var(--rural); color: white; }
+
+  /* COUNTER */
+  .contador {
+    padding: 10px 16px 4px;
+    font-size: 13px;
+    color: var(--texto-muted);
+  }
+
+  /* CARDS */
+  .lista {
+    padding: 8px 12px 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .card {
+    background: white;
+    border-radius: 14px;
+    border: 1px solid var(--borda);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+
+  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.09); }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+  }
+
+  .badge-linha {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 0.5px;
+    background: var(--verde);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 8px;
+    min-width: 60px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .badge-linha.rural { background: var(--rural); }
+
+  .card-info { flex: 1; }
+
+  .card-nome {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--texto);
+    line-height: 1.3;
+  }
+
+  .card-tipo {
+    font-size: 12px;
+    color: var(--texto-muted);
+    margin-top: 2px;
+  }
+
+  .card-arrow {
+    font-size: 18px;
+    color: var(--borda);
+    transition: color 0.15s, transform 0.2s;
+  }
+
+  .card:hover .card-arrow { color: var(--verde); }
+  .card.aberto .card-arrow { transform: rotate(90deg); color: var(--verde); }
+
+  .card-body {
+    display: none;
+    padding: 0 16px 14px;
+    border-top: 1px solid var(--borda);
+    animation: slideDown 0.2s ease;
+  }
+
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card.aberto .card-body { display: block; }
+
+  .info-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+
+  .info-pill {
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: var(--verde-claro);
+    color: var(--verde-escuro);
+    font-weight: 500;
+  }
+
+  .info-pill.rural-pill {
+    background: var(--rural-claro);
+    color: #8a4a00;
+  }
+
+  .trajeto {
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--texto-muted);
+    line-height: 1.6;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .trajeto-icon { font-size: 16px; margin-top: 1px; flex-shrink: 0; }
+
+  /* BANNER */
+  .banner {
+    margin: 10px 12px 4px;
+    background: #FFE600;
+    border-radius: 14px;
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    overflow: hidden;
+    position: relative;
+  }
+  .banner::after {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 140px; height: 140px;
+    background: rgba(0,0,0,0.05);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .banner-left { flex: 1; position: relative; z-index: 1; }
+  .banner-tag {
+    display: inline-block;
+    background: #1a1a1a;
+    color: #FFE600;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 6px;
+  }
+  .banner-titulo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    color: #1a1a1a;
+    line-height: 1.1;
+    margin-bottom: 4px;
+  }
+  .banner-sub {
+    font-size: 12px;
+    color: #444;
+    margin-bottom: 10px;
+    line-height: 1.4;
+  }
+  .banner-btn {
+    display: inline-block;
+    background: #1a1a1a;
+    color: #FFE600;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 18px;
+    border-radius: 50px;
+    text-decoration: none;
+  }
+  .banner-right {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 1;
+    flex-shrink: 0;
+  }
+  .banner-cart {
+    width: 56px; height: 56px;
+    background: #1a1a1a;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+  }
+  .banner-stars { color: #1a1a1a; font-size: 13px; letter-spacing: 1px; }
+  .banner-frete {
+    font-size: 11px;
+    font-weight: 700;
+    background: #1a1a1a;
+    color: #FFE600;
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+
+  /* DESTAQUE */
+  .destaque-badge {
+    font-size: 11px;
+    background: var(--amarelo);
+    color: #5a3c00;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 600;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+
+  /* VAZIO */
+  .vazio {
+    display: none;
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--texto-muted);
+  }
+
+  .vazio-emoji { font-size: 48px; display: block; margin-bottom: 12px; }
+  .vazio p { font-size: 16px; font-weight: 500; }
+  .vazio span { font-size: 13px; }
+
+  /* FOOTER */
+  footer {
+    position: fixed;
+    bottom: 0;
+    left: 0; right: 0;
+    background: white;
+    border-top: 1px solid var(--borda);
+    padding: 10px 16px;
+    font-size: 12px;
+    color: var(--texto-muted);
+    text-align: center;
+  }
+
+  footer strong { color: var(--verde); }
+
+  /* Destaque especial para linhas do usuário */
+  .card.especial { border-color: var(--amarelo); border-width: 2px; }
+  .card.especial .card-header { background: #fffde7; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div class="bus-icon">🚌</div>
+    <div class="header-title">
+      <h1>Cadê o Busão?</h1>
+      <p>Linhas de ônibus — Bragança Paulista, SP</p>
+    </div>
+  </div>
+  <div class="search-bar">
+    <div class="search-wrap">
+      <input type="text" id="busca" placeholder="Buscar por número ou bairro..." oninput="filtrar()" />
+    </div>
+  </div>
+</header>
+
+<div class="filtros">
+  <button class="filtro-btn ativo" onclick="setTipo('todos', this)">🚌 Todas</button>
+  <button class="filtro-btn" onclick="setTipo('urbano', this)">🏙️ Urbanas</button>
+  <button class="filtro-btn" onclick="setTipo('rural', this)">🌿 Rurais</button>
+</div>
+
+<div class="contador" id="contador"></div>
+
+<div class="banner">
+  <div class="banner-left">
+    <div class="banner-tag">Mercado Livre</div>
+    <div class="banner-titulo">As melhores ofertas aqui!</div>
+    <div class="banner-sub">Produtos com os melhores preços. Compra segura e entrega rápida.</div>
+    <a class="banner-btn" href="https://meli.la/1fAgbtR" target="_blank">Acessar loja →</a>
+  </div>
+  <div class="banner-right">
+    <div class="banner-cart">🛒</div>
+    <div class="banner-stars">★★★★★</div>
+    <div class="banner-frete">Frete Grátis</div>
+  </div>
+</div>
+
+<div class="lista" id="lista"></div>
+<div class="vazio" id="vazio">
+  <span class="vazio-emoji">🤷</span>
+  <p>Nenhuma linha encontrada</p>
+  <span>Tente outro número ou bairro</span>
+</div>
+
+<footer>
+  <strong>Cadê o Busão?</strong> · COM Bragança Paulista · Dados de referência 2026
+</footer>
+
+<script>
+const linhas = [
+  // URBANAS
+  { num: '01',   nome: 'Rodoviária / Feira Livre',                               tipo: 'urbano', trajeto: 'Centro → Rodoviária Velha → Feira Livre' },
+  { num: '02',   nome: 'Águas Claras / UPA Vila Davi',                            tipo: 'urbano', trajeto: 'Jd. Águas Claras → UPA → Vila Davi', obs: 'Tarifa Zero' },
+  { num: '04',   nome: 'Penha / USF',                                              tipo: 'urbano', trajeto: 'Bairro da Penha → Unidade de Saúde da Família' },
+  { num: '12',   nome: 'Parque dos Estados / Euroville',                           tipo: 'urbano', trajeto: 'Parque dos Estados → Centro → Euroville' },
+  { num: '105',  nome: 'Aldo Bolini / USF',                                        tipo: 'urbano', trajeto: 'Jd. Aldo Bolini → Unidade de Saúde da Família' },
+  { num: '110',  nome: 'Marina / Terminal Urbano',                                 tipo: 'urbano', trajeto: 'Bairro Marina → Terminal Urbano Central' },
+  { num: '112',  nome: 'Parque dos Estados / USF',                                 tipo: 'urbano', trajeto: 'Parque dos Estados → Unidade de Saúde da Família' },
+  { num: '113',  nome: 'Parque dos Estados / Bom Retiro',                          tipo: 'urbano', trajeto: 'Parque dos Estados → Centro → Bom Retiro' },
+  { num: '114',  nome: 'Jardim Fraternidade / Terminal Urbano',                    tipo: 'urbano', trajeto: 'Jd. Fraternidade → Terminal Urbano' },
+  { num: '115',  nome: 'Jardim das Palmeiras / Terminal Urbano',                   tipo: 'urbano', trajeto: 'Jd. das Palmeiras → Jd. São Miguel → Terminal Urbano' },
+  { num: '117',  nome: 'Menin / Rodoviária Velha',                                 tipo: 'urbano', trajeto: 'Bairro Menin → Centro → Rodoviária Velha' },
+  { num: '118',  nome: 'Jardim Iguatemi / Terminal Urbano',                        tipo: 'urbano', trajeto: 'Jd. Iguatemi → Terminal Urbano' },
+  { num: '119',  nome: 'Jardim das Palmeiras / Terminal Urbano via Fatec',         tipo: 'urbano', trajeto: 'Jd. das Palmeiras → FATEC → Terminal Urbano' },
+  { num: '120',  nome: 'Marcelo Stefani / Terminal Urbano',                        tipo: 'urbano', trajeto: 'Jd. Marcelo Stefani → Terminal Urbano' },
+  { num: '121',  nome: 'CDHU Saada / Terminal Urbano',                             tipo: 'urbano', trajeto: 'CDHU Saada → Terminal Urbano' },
+  { num: '122',  nome: 'Henedina / USF',                                           tipo: 'urbano', trajeto: 'Bairro Henedina → Unidade de Saúde da Família' },
+  { num: '123',  nome: 'Jardim São Miguel / Terminal Urbano',                      tipo: 'urbano', trajeto: 'Jd. São Miguel → Terminal Urbano' },
+  { num: '125',  nome: 'Jardim Iguatemi / Jardim Águas Claras',                    tipo: 'urbano', trajeto: 'Jd. Iguatemi → Centro → Jd. Águas Claras' },
+  { num: '126',  nome: 'Guaripocaba do Souza / Parque dos Estados',                tipo: 'urbano', trajeto: 'Guaripocaba do Souza → Parque dos Estados' },
+  { num: '128',  nome: 'Rodoviária / Shopping',                                    tipo: 'urbano', trajeto: 'Rodoviária Nova → Centro → Shopping' },
+  // RURAIS / DISTRITAIS
+  { num: '201',  nome: 'Morro Grande da Boa Vista / Rodoviária Velha',             tipo: 'rural',  trajeto: 'Morro Grande da Boa Vista → Rodoviária Velha' },
+  { num: '202',  nome: 'Biriça / Rodoviária Velha',                                 tipo: 'rural',  trajeto: 'Biriça → Zona Rural → Rodoviária Velha', especial: true },
+  { num: '204',  nome: 'Araras / Rodoviária Velha',                                tipo: 'rural',  trajeto: 'Distrito de Araras → Rodoviária Velha' },
+  { num: '205',  nome: 'Estiva do Agudo / Rodoviária Velha',                       tipo: 'rural',  trajeto: 'Estiva do Agudo → Rodoviária Velha' },
+  { num: '209',  nome: 'Bom Retiro do Bacci / Rodoviária Velha',                   tipo: 'rural',  trajeto: 'Bom Retiro do Bacci → Rodoviária Velha' },
+  { num: '212',  nome: 'Atibaianos / Rodoviária Velha',                            tipo: 'rural',  trajeto: 'Bairro Atibaianos → Rodoviária Velha' },
+  { num: '213',  nome: 'Boa Vista do Silva / Rodoviária Velha',                    tipo: 'rural',  trajeto: 'Boa Vista do Silva → Rodoviária Velha' },
+  { num: '216',  nome: 'Barreiro / Rodoviária Velha',                              tipo: 'rural',  trajeto: 'Bairro Barreiro → Zona Rural → Rodoviária Velha', especial: true },
+  { num: '217',  nome: 'Campo Novo / Rodoviária Velha',                            tipo: 'rural',  trajeto: 'Bairro Campo Novo → Zona Rural → Rodoviária Velha', especial: true },
+];
+
+let tipoAtivo = 'todos';
+
+function setTipo(tipo, btn) {
+  tipoAtivo = tipo;
+  document.querySelectorAll('.filtro-btn').forEach(b => { b.className = 'filtro-btn'; });
+  btn.classList.add(tipo === 'rural' ? 'ativo-rural' : 'ativo');
+  renderLinhas();
+}
+
+function filtrar() { renderLinhas(); }
+
+function toggleCard(idx) {
+  const card = document.getElementById('card-' + idx);
+  card.classList.toggle('aberto');
+}
+
+function renderLinhas() {
+  const busca = document.getElementById('busca').value.toLowerCase().trim();
+  const lista = document.getElementById('lista');
+  const vazio = document.getElementById('vazio');
+  const contador = document.getElementById('contador');
+
+  const filtradas = linhas.filter(l => {
+    const matchTipo = tipoAtivo === 'todos' || l.tipo === tipoAtivo;
+    const matchBusca = !busca ||
+      l.num.toLowerCase().includes(busca) ||
+      l.nome.toLowerCase().includes(busca) ||
+      (l.trajeto && l.trajeto.toLowerCase().includes(busca));
+    return matchTipo && matchBusca;
+  });
+
+  contador.textContent = filtradas.length + ' linha' + (filtradas.length !== 1 ? 's' : '') + ' encontrada' + (filtradas.length !== 1 ? 's' : '');
+
+  if (filtradas.length === 0) {
+    lista.innerHTML = '';
+    vazio.style.display = 'block';
+    return;
+  }
+
+  vazio.style.display = 'none';
+
+  lista.innerHTML = filtradas.map((l, i) => {
+    const isRural = l.tipo === 'rural';
+    const especial = l.especial ? ' especial' : '';
+    return `
+    <div class="card${especial}" id="card-${i}" onclick="toggleCard(${i})">
+      <div class="card-header">
+        <div class="badge-linha${isRural ? ' rural' : ''}">${l.num}</div>
+        <div class="card-info">
+          <div class="card-nome">
+            ${l.nome}
+            ${l.especial ? '<span class="destaque-badge">⭐ Destaque</span>' : ''}
+          </div>
+          <div class="card-tipo">${isRural ? '🌿 Linha Rural/Distrital' : '🏙️ Linha Urbana'}${l.obs ? ' · ' + l.obs : ''}</div>
+        </div>
+        <div class="card-arrow">›</div>
+      </div>
+      <div class="card-body">
+        <div class="trajeto">
+          <span class="trajeto-icon">🗺️</span>
+          <span>${l.trajeto}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-pill${isRural ? ' rural-pill' : ''}">Linha ${l.num}</span>
+          <span class="info-pill${isRural ? ' rural-pill' : ''}">${isRural ? 'Rural' : 'Urbana'}</span>
+          ${l.obs ? `<span class="info-pill${isRural ? ' rural-pill' : ''}">${l.obs}</span>` : ''}
+          <span class="info-pill${isRural ? ' rural-pill' : ''}">COM Bragança Paulista</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+renderLinhas();
+</script>
+</body>
+</html>
